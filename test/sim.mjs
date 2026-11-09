@@ -7,7 +7,7 @@ import { rngFor } from '../src/crisis/rng.js';
 const read = (path) => JSON.parse(readFileSync(new URL(`../${path}`, import.meta.url), 'utf8'));
 export const data = (() => {
   const map = read('data/map.json');
-  return { rules: read('data/rules.json'), cards: read('data/crises.json').cards, regions: map.regions, map };
+  return { rules: read('data/rules.json'), cards: read('data/crises.json').cards, regions: map.regions, map, lines: read('data/meridian-lines.json') };
 })();
 
 export function play(seed, player, d = data) {

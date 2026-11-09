@@ -7,7 +7,7 @@ import { newSeed } from './rng.js';
 
 const ENDING_TITLE = { treaty: 'TREATY SIGNED', standoff: 'STANDOFF', 'lights-out': 'LIGHTS OUT' };
 
-// ui = { term, mapView, panel, meters, mapText, scores, name, handover }
+// ui = { term, mapView, panel, meters, mapText, scores, name, handover, showScores, audio }
 export async function playCrisis(ui, data) {
   const { term } = ui;
   term.clear();
@@ -22,6 +22,7 @@ export async function playCrisis(ui, data) {
   let state = newGame(newSeed(), bloc, data);
   ui.mapView.reset();
   ui.panel.hidden = false;
+  ui.audio?.hum(true);
   document.documentElement.classList.add('playing');
   ui.mapView.layout();
   try {
@@ -45,15 +46,20 @@ export async function playCrisis(ui, data) {
       const before = state;
       state = resolve(state, move, meridianMove(state), data);
       showMeters(ui, state, data);
+      if (state.tension > before.tension && state.ending !== 'lights-out') ui.audio?.play('tension');
       await term.print(...roundReport(before, state, data));
       if (!state.ending) {
         await term.choose([{ label: 'NEXT ROUND', value: true }]);
       }
     }
-    if (state.ending === 'lights-out') await ui.mapView.lightsOut();
+    if (state.ending === 'lights-out') {
+      ui.audio?.play('lights-out');
+      await ui.mapView.lightsOut();
+    }
     await showEnding(ui, state, data);
   } finally {
     ui.panel.hidden = true;
+    ui.audio?.hum(false);
     document.documentElement.classList.remove('playing');
   }
 }
@@ -144,5 +150,7 @@ async function showEnding(ui, state, data) {
     const { kept, of } = await ui.handover(state);
     await term.print(`CITIES KEPT: ${kept} OF ${of}. NOT SCORED.`, '');
   }
+  await term.print(data.lines[state.ending], '');
+  await ui.showScores?.();
   await term.choose([{ label: 'BACK TO THE MENU', value: true }]);
 }
