@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Zero Sum app icon: a prompt and a green cursor block on a dark screen. Original artwork (MIT). -->
+  <rect width="512" height="512" fill="#050805"/>
+  <g fill="none" stroke="#4bff7a" stroke-width="26" stroke-linecap="square" stroke-linejoin="miter">
+    <path d="M150 196 L226 256 L150 316"/>
+  </g>
+  <rect x="262" y="282" width="100" height="34" fill="#4bff7a"/>
+</svg>
