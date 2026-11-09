@@ -183,7 +183,13 @@ async function about() {
     'ZERO SUM',
     'An original game. Free software under the MIT license.',
     { text: 'Source code', href: SOURCE },
-    'Nothing you do here leaves this device.',
+    '',
+    'MERIDIAN, the blocs, the continent and every place on it are invented.',
+    'The sounds are made in code, and the pictures are drawn as lines: no recordings, no images.',
+    'The site header comes from prignano-theme (MIT).',
+    '',
+    'Nothing you do here leaves this device: no accounts, no tracking.',
+    'Names and scores stay in this browser.',
   ];
   if (apple && !installed) lines.push('To install on iPhone or iPad: tap Share, then Add to Home Screen.');
   await term.print(...lines, '');
@@ -246,7 +252,7 @@ async function menu(name) {
     if (choice === 'crisis') {
       const data = await crisisData();
       mapView ??= new MapView($('map'), data.map, { reduced: () => settings.reduced });
-      await playCrisis({ term, mapView, panel: $('crisis-panel'), meters: $('meters'), mapText: $('map-text'), scores, name, handover }, data);
+      await playCrisis({ term, mapView, panel: $('crisis-panel'), meters: $('meters'), mapText: $('map-text'), scores, name, handover, showScores, audio }, data);
       term.clear();
     } else if (choice === 'intercept') {
       await intercept(name);

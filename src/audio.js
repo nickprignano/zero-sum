@@ -24,6 +24,7 @@ export class Audio {
   setMuted(muted) {
     this.muted = muted;
     save(MUTE_KEY, muted);
+    if (muted) this.hum(false);
   }
 
   tone(freq, ms, { type = 'sine', volume = 0.1, slideTo = null, delay = 0 } = {}) {
@@ -55,6 +56,22 @@ export class Audio {
     gain.gain.value = volume;
     source.connect(gain).connect(ctx.destination);
     source.start(ctx.currentTime + delay / 1000);
+  }
+
+  // A quiet low hum under Crisis, like an old machine room. Muting stops it.
+  hum(on) {
+    if (this.humNode) {
+      this.humNode.stop();
+      this.humNode = null;
+    }
+    if (!on || this.muted || !this.ctx) return;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.frequency.value = 55;
+    gain.gain.value = 0.02;
+    osc.connect(gain).connect(this.ctx.destination);
+    osc.start();
+    this.humNode = osc;
   }
 
   play(name) {
@@ -89,6 +106,12 @@ export class Audio {
           this.tone(440, 600, { type: 'sawtooth', volume: 0.025, slideTo: 880, delay: i * 1200 });
           this.tone(880, 600, { type: 'sawtooth', volume: 0.025, slideTo: 440, delay: i * 1200 + 600 });
         }
+        break;
+      case 'tension':
+        this.tone(330, 500, { type: 'triangle', volume: 0.05, slideTo: 520 });
+        break;
+      case 'lights-out':
+        this.tone(440, 3000, { type: 'triangle', volume: 0.06, slideTo: 55 });
         break;
     }
   }

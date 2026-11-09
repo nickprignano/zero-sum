@@ -111,3 +111,13 @@ test('the hook: every lights-out scores below every standoff and treaty, and jud
   assert.ok(results.verifyThenAnswer.avg > results.alwaysTalk.avg, JSON.stringify(results));
   assert.ok(results.verifyThenAnswer.avg > results.alwaysStrike.avg);
 });
+
+test('MERIDIAN has one closing line for each ending, and every ending is reachable', () => {
+  const endings = new Set();
+  for (let seed = 0; seed < 300; seed++) for (const p of Object.values(players)) endings.add(play(seed, p).ending);
+  assert.deepEqual([...endings].sort(), ['lights-out', 'standoff', 'treaty']);
+  for (const ending of endings) {
+    const line = data.lines[ending];
+    assert.ok(typeof line === 'string' && line.length <= 72 && line === line.toUpperCase(), ending);
+  }
+});

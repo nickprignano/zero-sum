@@ -1,11 +1,12 @@
 // Service worker: keeps a copy of every game file so the installed app plays offline.
 // VERSION and FILES are written by `node tools/sw-version.mjs`; a test fails if they're stale.
 
-const VERSION = 'ea3f96b5bc1e';
+const VERSION = '0fb99239fac2';
 const FILES = [
   'data/crises.json',
   'data/intercept.json',
   'data/map.json',
+  'data/meridian-lines.json',
   'data/rules.json',
   'icons/apple-touch-icon.png',
   'icons/icon-192.png',
