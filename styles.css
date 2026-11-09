@@ -1,0 +1,144 @@
+/* Fallback copies of prignano-theme's color tokens (for the bar and header), used if the shared
+   theme can't load. The game screen keeps its own phosphor colors in both themes. */
+:root {
+  --bg: #f6f7f9;
+  --fg: #111418;
+  --muted: #5f6873;
+  --card: #ffffff;
+  --border: #e3e6ea;
+  --accent: #2563d6;
+  --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --crt-bg: #050805;
+  --crt-fg: #4bff7a;
+  --crt-dim: #2a9e4c;
+  --crt-font: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0d1117; --fg: #e6edf3; --muted: #8b949e; --card: #151b23; --border: #2a313c; --accent: #58a6ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0d1117; --fg: #e6edf3; --muted: #8b949e; --card: #151b23; --border: #2a313c; --accent: #58a6ff;
+}
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font);
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+body { display: flex; flex-direction: column; height: 100dvh; }
+#site-header { flex-shrink: 0; }
+#site-header.collapsed { display: none; }
+#app { flex: 1; min-height: 0; display: flex; flex-direction: column; background: var(--crt-bg); }
+
+.bar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 6px max(12px, env(safe-area-inset-right)) 6px max(12px, env(safe-area-inset-left));
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+.bar button {
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--fg);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 12px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.bar button:hover, .bar button:focus-visible { border-color: var(--accent); outline: none; }
+
+[hidden] { display: none !important; }
+
+/* The phosphor terminal. */
+.crt { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.screen {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  background: var(--crt-bg);
+  color: var(--crt-fg);
+  font-family: var(--crt-font);
+  font-size: clamp(0.95rem, 2.6vw, 1.1rem);
+  line-height: 1.5;
+  text-shadow: 0 0 6px rgba(75, 255, 122, 0.45);
+}
+.crt::after {
+  /* Scanlines over the game screen only, turned off by Reduce effects. */
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0) 0 2px, rgba(0, 0, 0, 0.18) 2px 3px);
+}
+.out { max-width: 72ch; white-space: pre-wrap; overflow-wrap: anywhere; }
+.out .line { min-height: 1.5em; }
+.out .line.typing::after { content: "█"; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+.choices { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; margin-top: 12px; max-width: 72ch; }
+.choices button, .screen .link {
+  font: inherit;
+  color: var(--crt-fg);
+  background: transparent;
+  border: 1px solid var(--crt-dim);
+  border-radius: 2px;
+  padding: 8px 14px;
+  min-height: 44px;
+  text-align: left;
+  text-shadow: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.choices button:focus-visible {
+  background: var(--crt-fg);
+  color: var(--crt-bg);
+  text-shadow: none;
+  outline: none;
+}
+/* Hover only where there's a real pointer, so a tapped button doesn't stay lit on phones. */
+@media (hover: hover) {
+  .choices button:hover { background: var(--crt-fg); color: var(--crt-bg); text-shadow: none; }
+}
+.prompt { display: flex; align-items: center; gap: 8px; margin-top: 12px; max-width: 72ch; }
+.prompt input {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-size: max(16px, 1em); /* 16px or more stops iPhones zooming in on focus */
+  color: var(--crt-fg);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--crt-dim);
+  border-radius: 0;
+  padding: 4px 0;
+  caret-color: var(--crt-fg);
+  text-transform: uppercase;
+  text-shadow: inherit;
+}
+.prompt input:focus { outline: none; border-bottom-color: var(--crt-fg); }
+.screen a { color: var(--crt-fg); }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Reduce effects (the player's switch, or the system's reduced-motion setting). */
+.reduce .screen { text-shadow: none; }
+.reduce .crt::after { display: none; }
+.reduce .out .line.typing::after { animation: none; }

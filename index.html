@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Zero Sum</title>
+  <meta name="description" content="Dial in to an old green-screen computer and get through a standoff without anyone launching.">
+  <script>
+    // Apply the saved light/dark choice before the first paint, like prignano-theme's THEME_INIT_SCRIPT.
+    (function () { try { var m = document.cookie.match(/(?:^|; )theme=(light|dark)/); var t = m ? m[1] : localStorage.getItem('theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {} })();
+  </script>
+  <!-- Installable app (PWA): manifest, icons, iOS home-screen tags. sw.js keeps it playable offline. -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="theme-color" content="#050805">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Zero Sum">
+  <link rel="stylesheet" href="styles.css">
+  <!-- The shared site theme. The game screen keeps its own dark look either way. -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/nickprignano/prignano-theme@4c2effc3829269e40ad663baf130a6b899a402bb/theme.css">
+</head>
+<body>
+  <div id="site-header"></div>
+  <main id="app">
+    <div class="bar" role="toolbar" aria-label="Game controls">
+      <button type="button" id="btn-mute" aria-pressed="false">Sound off</button>
+      <button type="button" id="btn-header" aria-label="Hide the site header" aria-expanded="true">▴</button>
+    </div>
+    <div class="crt">
+    <div class="screen" id="screen">
+      <!-- What sighted players see, typed out. Screen readers get whole lines from #spoken instead. -->
+      <div class="out" id="out" aria-hidden="true"></div>
+      <div class="sr-only" id="spoken" aria-live="polite"></div>
+      <div class="choices" id="choices"></div>
+      <form class="prompt" id="prompt" hidden autocomplete="off">
+        <label for="cmd" id="cmd-label">&gt;</label>
+        <input id="cmd" autocapitalize="characters" spellcheck="false" enterkeyhint="go">
+      </form>
+    </div>
+    </div>
+  </main>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
