@@ -138,6 +138,33 @@ body { display: flex; flex-direction: column; height: 100dvh; }
   white-space: nowrap;
 }
 
+/* Crisis: meters and map above the terminal on phones, beside it on wide screens. */
+.panel {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
+  color: var(--crt-fg);
+  font-family: var(--crt-font);
+  font-size: 0.8rem;
+}
+.meters { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 2px 16px; }
+.meter { display: flex; justify-content: space-between; gap: 8px; border-bottom: 1px solid rgba(75, 255, 122, 0.15); }
+.meter span:first-child { color: var(--crt-dim); }
+.meter .danger { color: #ff9a4b; }
+.meter span.ember { color: rgb(255, 179, 71); }
+.meter span.tidewater { color: rgb(90, 209, 255); }
+.playing .choices { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); width: 100%; }
+.playing .choices button { text-align: center; }
+#map { width: 100%; height: 34dvh; display: block; }
+@media (min-width: 900px) and (orientation: landscape) {
+  .playing .crt { flex-direction: row; }
+  .playing .panel { flex: 1.4; padding-bottom: 16px; }
+  .playing #map { flex: 1; height: auto; min-height: 0; }
+  .playing .screen { flex: 1; }
+}
+
 /* Reduce effects (the player's switch, or the system's reduced-motion setting). */
 .reduce .screen { text-shadow: none; }
 .reduce .crt::after { display: none; }

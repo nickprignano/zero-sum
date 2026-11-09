@@ -1,8 +1,7 @@
 # Zero Sum spec (v1)
 
-Status: the owner's answers (2026-11-08) are folded in, and it's red-teamed twice with Fable
-(changes listed at the end). Waiting for the owner's approval in PR #1. Nothing gets built until
-it's approved.
+Status: approved in PR #1 (2026-11-09). Build 2 tuned the Crisis numbers by simulation (see
+Tuning). Red-teamed twice with Fable (changes listed at the end).
 
 The game is called **Zero Sum** (the owner's pick). It borrows the mood of 1980s "computer that
 nearly starts a war" stories and nothing else: no film names, characters, plot beats, quotes,
@@ -85,7 +84,7 @@ All visible to the player at all times, for both sides.
 | Meter | Range | Start | Meaning |
 | --- | --- | --- | --- |
 | **Tension** | 0 to 6, shared | 1 | Rises with escalation. Reaching 6 is an exchange: the game ends |
-| **Trust** | 0 to 10, shared | 5 | Needed for a treaty |
+| **Trust** | 0 to 10, shared | 3 | Needed for a treaty |
 | **Standing** | 0 to 10, one per side | 5 | How strong a side looks at home. At 0, hardliners take over that side |
 
 ### Cards
@@ -99,20 +98,21 @@ About 30 written cards in `data/crises.json`, each set in one region. Two kinds:
 
 ### A round, in order
 
-1. Draw the next card. A threat card adds its `tension` value (0 or 1) at once.
+1. Draw the next card. A threat card adds its `tension` value (0 or 1) at once, but a card never
+   pushes tension past 5 on its own.
 2. The player may **VERIFY** a threat card once: it costs the player 1 standing and shows
    whether the card is real. The round doesn't advance.
 3. The player picks a move. MERIDIAN picks its move at the same time, without seeing the
    player's move or the card's secret.
 4. Both moves are revealed and applied together (table below), then the card's consequences.
-5. **Cool-down:** if neither side picked `SIGNAL` or `STRIKE` this round, tension drops by 1.
+5. **Cool-down:** if no move raised tension this round, tension drops by 1.
 6. Clamp every meter to its range, then check for an ending. A threat round in which tension
    didn't rise counts as one **crisis defused**.
 
 ### Moves
 
-Starting values. The simulation test tunes them before v1 ships, and the final numbers go in
-`data/rules.json`, not in code.
+Tuned by simulation in build 2 (see Tuning below). The numbers live in `data/rules.json`, not in
+code.
 
 | Move | Tension | Trust | Own standing |
 | --- | --- | --- | --- |
@@ -124,13 +124,15 @@ Starting values. The simulation test tunes them before v1 ships, and the final n
 
 Card consequences, per side:
 
+- **A fair answer:** `SIGNAL` against a real threat adds no tension. This is what `VERIFY` is
+  for: it tells you when a firm answer is safe.
 - **Escalating against a false alarm** (`SIGNAL` or `STRIKE`): trust -2 more.
-- **Not answering a real threat** (`HOLD`, `TALK` or `AID`): own standing -1 more.
+- **Not answering a real threat** (`HOLD`, `TALK` or `AID`): own standing -2 more.
 - **`TALK` on an opening card:** trust +1 more.
 
-**Hardliners.** When a side's standing reaches 0, its `TALK` and `AID` are locked for the next
-two rounds, then its standing resets to 3. This applies to the player as much as to MERIDIAN,
-so always talking runs out of road.
+**Hardliners.** When a side's standing reaches 0, trust drops by 4 at once, its `TALK` and `AID`
+are locked for the next two rounds, and then its standing resets to 2. This applies to the
+player as much as to MERIDIAN, so always talking runs out of road.
 
 ### MERIDIAN
 
@@ -140,6 +142,9 @@ so always talking runs out of road.
 - Its **temperament** (calm, wary or brittle) sets how much it believes threat cards and how
   much trust it needs before it will talk. Calm talks from trust 6, wary from 7, brittle from 8
   and only when tension is 2 or less.
+- Every point of trust above 5 makes it 5% less likely to believe a
+  threat, and a player who signalled or struck in the last three rounds makes it 20% more likely.
+- It pushes a player who looks weak (standing 2 or less) with a `SIGNAL`, unless it's calm.
 - It never uses `VERIFY`, so it is sometimes fooled by false alarms. Players can learn to see
   that coming.
 
@@ -147,7 +152,7 @@ so always talking runs out of road.
 
 | Ending | When | Score |
 | --- | --- | --- |
-| **Treaty** | At the end of a round where both sides played `TALK`, trust is 8 or more and tension is 2 or less | 600 + 100 per crisis defused + 25 per round left |
+| **Treaty** | From round 4, at the end of a round where both sides played `TALK`, trust is 8 or more and tension is 2 or less | 600 + 100 per crisis defused + 25 per round left |
 | **Standoff** | Round 12 ends with no exchange | 300 + 100 per crisis defused + 10 per point of trust |
 | **Lights out** | Tension reaches 6 | 0 if the player ever played `STRIKE`, otherwise 20 per round played (at most 240) |
 
@@ -158,6 +163,16 @@ isn't automatically the top score: engaging with the cards is.
 On lights out, after the score screen, Crisis hands over to one final, overwhelming **Intercept**
 wave (see "When it follows a lost Crisis"). It adds nothing to any score. Then MERIDIAN prints its one closing line for that ending from `data/meridian-lines.json` (for example
 `SESSION ENDED. NOTHING LEFT TO SCORE.`). The owner reads and approves every line in the PR.
+
+### Tuning
+
+Build 2 tuned the numbers with 10,000 seeded games per scripted player (test 2). With the values
+above: random play averages about 130 and loses to lights out 86% of the time; always striking
+scores 0; always talking averages about 845 and wins a treaty against a brittle MERIDIAN in about
+1 game in 14; checking every threat and answering real ones with `SIGNAL` averages about 865 and
+wins that treaty in about 1 game in 4. The first draft's numbers let always talking win almost
+everything, so the fair answer, the harsher hardliners, a lower starting trust and "no treaty
+before round 4" were added.
 
 ### Deliberately missing
 
