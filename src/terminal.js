@@ -117,7 +117,9 @@ export class Terminal {
       this.label.textContent = ask ? `${ask.label}` : '>';
       this.input.setAttribute('aria-label', ask ? ask.label : 'Type a command');
       this.input.value = '';
-      this.prompt.hidden = false;
+      // Touch screens only need the typed line for free text (the login name); buttons do the rest.
+      const finePointer = globalThis.matchMedia?.('(pointer: fine)').matches;
+      this.prompt.hidden = !ask && !finePointer;
 
       const onKey = (event) => {
         const i = buttons.indexOf(document.activeElement);
@@ -154,7 +156,6 @@ export class Terminal {
 
       // Keyboard players start typing or arrowing at once. On touch screens, focusing the
       // input would pop up the keyboard, so the buttons are enough.
-      const finePointer = globalThis.matchMedia?.('(pointer: fine)').matches;
       if (ask && finePointer) this.input.focus({ preventScroll: true });
       else if (finePointer) buttons[0]?.focus({ preventScroll: true });
       this.scroll();

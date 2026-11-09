@@ -1,7 +1,10 @@
 // The page: content note, dial-in, login and MERIDIAN's menu, plus sound, the site header and
-// the installable app. Crisis and Intercept arrive in the next builds (docs/SPEC.md).
+// the installable app. Intercept arrives in the next build (docs/SPEC.md).
 
 import { Audio } from './audio.js';
+import { loadCrisisData } from './crisis/data.js';
+import { playCrisis } from './crisis/play.js';
+import { MapView } from './map.js';
 import { Scores } from './scores.js';
 import { Settings } from './settings.js';
 import { cleanName, Terminal } from './terminal.js';
@@ -142,10 +145,18 @@ async function dialIn() {
 
 const HOW_TO_PLAY = [
   'CRISIS',
-  'Two blocs, one shared tension meter. Each round a crisis card arrives.',
-  'You and MERIDIAN pick a move at the same time: TALK, AID, HOLD, SIGNAL or STRIKE.',
-  'Some threats are false alarms. VERIFY costs a little standing and tells you which.',
-  'If tension reaches 6, the game ends for everyone. Peace always scores better.',
+  'Two blocs, one shared tension meter, 12 rounds. Each round a crisis card arrives.',
+  'You and MERIDIAN pick a move at the same time:',
+  '  TALK builds trust but costs a little standing at home. AID does both, more.',
+  '  HOLD changes nothing. SIGNAL shows strength and raises tension.',
+  '  STRIKE raises tension a lot and wrecks trust.',
+  'Some threats are false alarms. VERIFY costs 1 standing and tells you which.',
+  'A SIGNAL against a real threat is fair: it does not raise tension.',
+  'Escalating over a false alarm costs trust. Letting a real threat pass costs standing.',
+  'At 0 standing, your hardliners take over: no TALK or AID for 2 rounds, and trust collapses.',
+  'Tension eases in any round where nobody raises it.',
+  'From round 4, both sides TALK with trust 8 or more and tension 2 or less: a treaty.',
+  'If tension reaches 6, the lights go out for everyone. Peace always scores more.',
   '',
   'INTERCEPT',
   'Tap the sky to set off a burst. Every trace inside the ring is stopped.',
@@ -176,6 +187,10 @@ async function about() {
   await term.print(...lines, '');
 }
 
+let crisisDataPromise = null;
+let mapView = null;
+const crisisData = () => (crisisDataPromise ??= loadCrisisData());
+
 async function menu(name) {
   for (;;) {
     await term.print('GAMES AVAILABLE:');
@@ -191,8 +206,13 @@ async function menu(name) {
     if (updateWaiting) options.push({ label: 'UPDATE THE GAME', value: 'update' });
     const choice = await term.choose(options);
     term.clear();
-    if (choice === 'crisis' || choice === 'intercept') {
-      await term.print(`${choice.toUpperCase()} IS NOT LOADED ON THIS SYSTEM YET, ${name}.`, 'CHECK BACK SOON.', '');
+    if (choice === 'crisis') {
+      const data = await crisisData();
+      mapView ??= new MapView($('map'), data.map, { reduced: () => settings.reduced });
+      await playCrisis({ term, mapView, panel: $('crisis-panel'), meters: $('meters'), mapText: $('map-text'), scores, name }, data);
+      term.clear();
+    } else if (choice === 'intercept') {
+      await term.print(`INTERCEPT IS NOT LOADED ON THIS SYSTEM YET, ${name}.`, 'CHECK BACK SOON.', '');
     } else if (choice === 'how') {
       await term.print(...HOW_TO_PLAY, '');
     } else if (choice === 'scores') {

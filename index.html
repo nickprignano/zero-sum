@@ -30,6 +30,11 @@
       <button type="button" id="btn-header" aria-label="Hide the site header" aria-expanded="true">▴</button>
     </div>
     <div class="crt">
+    <section class="panel" id="crisis-panel" hidden aria-label="Crisis status">
+      <div class="meters" id="meters"></div>
+      <canvas id="map" aria-hidden="true"></canvas>
+      <ul class="sr-only" id="map-text" aria-label="Map"></ul>
+    </section>
     <div class="screen" id="screen">
       <!-- What sighted players see, typed out. Screen readers get whole lines from #spoken instead. -->
       <div class="out" id="out" aria-hidden="true"></div>
