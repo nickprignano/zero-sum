@@ -1,9 +1,11 @@
 // The page: content note, dial-in, login and MERIDIAN's menu, plus sound, the site header and
-// the installable app. Intercept arrives in the next build (docs/SPEC.md).
+// the installable app (docs/SPEC.md).
 
 import { Audio } from './audio.js';
 import { loadCrisisData } from './crisis/data.js';
 import { playCrisis } from './crisis/play.js';
+import { handoverWave } from './intercept/game.js';
+import { playIntercept } from './intercept/play.js';
 import { MapView } from './map.js';
 import { Scores } from './scores.js';
 import { Settings } from './settings.js';
@@ -190,6 +192,41 @@ async function about() {
 let crisisDataPromise = null;
 let mapView = null;
 const crisisData = () => (crisisDataPromise ??= loadCrisisData());
+let interceptPromise = null;
+const interceptData = () => (interceptPromise ??= fetch('data/intercept.json').then((r) => r.json()));
+
+const interceptUi = {
+  root: $('intercept'),
+  canvas: $('sky'),
+  scanButton: $('btn-scan'),
+  pauseButton: $('btn-pause'),
+  quitButton: $('btn-quit'),
+  status: $('sky-status'),
+  audio,
+  settings,
+};
+
+async function intercept(name) {
+  await term.print('INTERCEPT', 'Tap the sky to set off a burst. S scans for decoys, P pauses.', 'A fast reflex game: it has no screen-reader version.', '');
+  if (!(await term.choose([{ label: 'START', value: true }, { label: 'BACK', value: false }]))) return;
+  term.clear();
+  const result = await playIntercept(interceptUi, await interceptData());
+  if (result.quit) return;
+  await term.print('THE LAST CITY HAS FALLEN.', '', `WAVE REACHED: ${result.wave}`, `SCORE: ${result.score}`, '');
+  if (scores.qualifies('intercept', result.score)) {
+    scores.add('intercept', name, result.score, { wave: result.wave });
+    await term.print('A NEW HIGH SCORE.', '');
+  }
+  await term.choose([{ label: 'BACK TO THE MENU', value: true }]);
+  term.clear();
+}
+
+// After a lost Crisis: one overwhelming wave, never scored. Returns the cities kept.
+async function handover(crisisState) {
+  const config = await interceptData();
+  const result = await playIntercept(interceptUi, config, { handover: handoverWave(crisisState, config), seed: crisisState.seed });
+  return { kept: result.kept, of: config.cities };
+}
 
 async function menu(name) {
   for (;;) {
@@ -209,10 +246,10 @@ async function menu(name) {
     if (choice === 'crisis') {
       const data = await crisisData();
       mapView ??= new MapView($('map'), data.map, { reduced: () => settings.reduced });
-      await playCrisis({ term, mapView, panel: $('crisis-panel'), meters: $('meters'), mapText: $('map-text'), scores, name }, data);
+      await playCrisis({ term, mapView, panel: $('crisis-panel'), meters: $('meters'), mapText: $('map-text'), scores, name, handover }, data);
       term.clear();
     } else if (choice === 'intercept') {
-      await term.print(`INTERCEPT IS NOT LOADED ON THIS SYSTEM YET, ${name}.`, 'CHECK BACK SOON.', '');
+      await intercept(name);
     } else if (choice === 'how') {
       await term.print(...HOW_TO_PLAY, '');
     } else if (choice === 'scores') {

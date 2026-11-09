@@ -76,6 +76,20 @@ export class Audio {
         this.tone(1200, 300, { type: 'triangle', volume: 0.05, delay: 1650, slideTo: 2400 });
         this.noise(900, { volume: 0.03, delay: 1950 });
         break;
+      case 'launch':
+        this.tone(160, 90, { type: 'triangle', volume: 0.08, slideTo: 60 });
+        break;
+      case 'boom':
+        this.noise(500, { volume: 0.08 });
+        this.tone(70, 1400, { type: 'sine', volume: 0.14, slideTo: 30 });
+        break;
+      case 'siren':
+        // A rise and fall, twice.
+        for (let i = 0; i < 2; i++) {
+          this.tone(440, 600, { type: 'sawtooth', volume: 0.025, slideTo: 880, delay: i * 1200 });
+          this.tone(880, 600, { type: 'sawtooth', volume: 0.025, slideTo: 440, delay: i * 1200 + 600 });
+        }
+        break;
     }
   }
 }
