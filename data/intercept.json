@@ -1,0 +1,20 @@
+{
+  "note": "Intercept numbers, in playfield units (1000 x 600, y down; a tall 600 x 1000 field on portrait screens) and seconds. docs/SPEC.md, 'Intercept rules'.",
+  "width": 1000,
+  "height": 600,
+  "cityY": 560,
+  "cities": 8,
+  "portrait": { "width": 600, "height": 1000, "cityY": 960 },
+  "wave1": { "incoming": 8, "fallSeconds": 12, "decoyShare": 0, "splits": 0 },
+  "perWave": { "incoming": 2, "fallFactor": 0.9, "decoyShareFrom": 2, "decoyShareStart": 0.15, "decoyShareStep": 0.05, "decoyShareMax": 0.35, "splitsFrom": 3 },
+  "spawnGapShare": 0.25,
+  "decoyReveal": 0.6,
+  "decoyVanish": 0.75,
+  "splitAt": 0.4,
+  "burst": { "radius": 50, "growSeconds": 0.4, "lifeSeconds": 1 },
+  "pool": { "size": 10, "refillPerSecond": 1 },
+  "scanSeconds": 3,
+  "scorePerCityPerWave": 100,
+  "glow": { "radius": 150, "maxPerSecond": 3 },
+  "handover": { "base": 12, "perStanding": 2, "min": 20, "decoysFrom": 6, "spawnGapShare": 0.12 }
+}

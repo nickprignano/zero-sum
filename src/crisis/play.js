@@ -7,7 +7,7 @@ import { newSeed } from './rng.js';
 
 const ENDING_TITLE = { treaty: 'TREATY SIGNED', standoff: 'STANDOFF', 'lights-out': 'LIGHTS OUT' };
 
-// ui = { term, mapView, panel, meters, mapText, scores, name }
+// ui = { term, mapView, panel, meters, mapText, scores, name, handover }
 export async function playCrisis(ui, data) {
   const { term } = ui;
   term.clear();
@@ -135,6 +135,14 @@ async function showEnding(ui, state, data) {
   if (scores.qualifies('crisis', state.score)) {
     scores.add('crisis', name, state.score, { ending: state.ending, seed: state.seed });
     await term.print('A NEW HIGH SCORE.', '');
+  }
+  // Lights out hands over to one Intercept wave after the score, so the lesson lands first.
+  // It is built to be overwhelming and adds nothing to any score.
+  if (state.ending === 'lights-out' && ui.handover) {
+    await term.choose([{ label: 'CONTINUE', value: true }]);
+    term.clear();
+    const { kept, of } = await ui.handover(state);
+    await term.print(`CITIES KEPT: ${kept} OF ${of}. NOT SCORED.`, '');
   }
   await term.choose([{ label: 'BACK TO THE MENU', value: true }]);
 }

@@ -216,7 +216,7 @@ fit the screen at a fixed shape):
 | Time to fall the full height | 12 s | × 0.9 |
 | Decoys (share of incoming) | 0 (wave 2: 15%) | +5 points, at most 35% |
 | Splitting traces | 0 (wave 3: 1) | +1 |
-| Burst ring radius | 50 units, never under 44 CSS px on screen | same |
+| Burst ring radius | 50 units, never under 44 CSS px across on screen | same |
 | Pool size, refill | 10, 1 per second | same |
 
 ### When it follows a lost Crisis
@@ -226,7 +226,8 @@ lands first, then one Intercept wave, then MERIDIAN's closing line and the high 
 
 - The wave is built to be overwhelming: incoming = 12 + 2 × (both sides' standing), at least
   20; decoys = 6 minus crises defused, at least 0; the pool starts at 10 and doesn't refill.
-- A **Skip** button is always there.
+- A **Skip** button is always there. Skipping plays the rest of the wave out unseen with no
+  more taps, so the count below stays honest.
 - The result reads "Cities kept: N of 8. Not scored." It never counts toward the Crisis score
   and never goes in the Intercept high-score table.
 
@@ -259,8 +260,8 @@ lands first, then one Intercept wave, then MERIDIAN's closing line and the high 
   taps in the sky never hit a button. Thumbs cover the bottom of the screen, so the playfield
   keeps a margin above the bar.
 - Canvas backing store capped at 2× pixel ratio. Glow is drawn as a wide faint stroke under a
-  thin bright one with `lighter` blending, not `shadowBlur`, which is slow on iPhones. Rings and
-  particles are drawn once to small offscreen canvases and stamped. At most 200 particles.
+  thin bright one with `lighter` blending, not `shadowBlur`, which is slow on iPhones. At most
+  200 particles.
 - Fixed time step of 1/60 s in game time, at most 5 catch-up steps a frame. The game pauses
   when its tab is hidden and resumes with a 3-second countdown, like pinball.
 - Each wave comes from the game's seed, so a run is repeatable in tests.
@@ -304,8 +305,9 @@ tests and tools need only Node.
   dashed), so colorblind players can tell them apart.
 - Phones in portrait: meters on top, map, then the card and the move buttons. Wide screens and
   landscape tablets: map on the left, terminal on the right. Intercept fills the screen in
-  either orientation, with the playfield kept at a fixed shape and scaled to fit. The app
-  doesn't lock orientation.
+  either orientation, with the playfield kept at a fixed shape and scaled to fit: 1000 × 600 on
+  landscape screens, 600 × 1000 on portrait ones (chosen when the game starts, so the sky fills
+  a phone held upright). The app doesn't lock orientation.
 
 ### Accessibility
 

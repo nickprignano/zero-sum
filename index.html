@@ -35,6 +35,15 @@
       <canvas id="map" aria-hidden="true"></canvas>
       <ul class="sr-only" id="map-text" aria-label="Map"></ul>
     </section>
+    <section class="sky" id="intercept" hidden aria-label="Intercept">
+      <canvas id="sky" aria-hidden="true"></canvas>
+      <div class="controls" role="toolbar" aria-label="Intercept controls">
+        <button type="button" id="btn-scan">SCAN</button>
+        <span class="status" id="sky-status"></span>
+        <button type="button" id="btn-pause">PAUSE</button>
+        <button type="button" id="btn-quit">QUIT</button>
+      </div>
+    </section>
     <div class="screen" id="screen">
       <!-- What sighted players see, typed out. Screen readers get whole lines from #spoken instead. -->
       <div class="out" id="out" aria-hidden="true"></div>

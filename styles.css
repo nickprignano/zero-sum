@@ -165,6 +165,40 @@ body { display: flex; flex-direction: column; height: 100dvh; }
   .playing .screen { flex: 1; }
 }
 
+/* Intercept fills the game screen. Its controls sit in a bar under the playfield, so taps in the
+   sky never hit a button, with a margin above the bar for thumbs. */
+.intercepting .screen, .intercepting .panel { display: none !important; }
+.sky { flex: 1; min-height: 0; display: flex; flex-direction: column; background: #050a14; }
+#sky { flex: 1; min-height: 0; width: 100%; display: block; touch-action: none; user-select: none; -webkit-user-select: none; }
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 8px max(12px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  background: var(--crt-bg);
+  border-top: 1px solid var(--crt-dim);
+  color: var(--crt-fg);
+  font-family: var(--crt-font);
+  font-size: 0.8rem;
+}
+.controls .status { flex: 1; min-width: 0; text-align: center; }
+.controls button {
+  font: inherit;
+  color: var(--crt-fg);
+  background: transparent;
+  border: 1px solid var(--crt-dim);
+  border-radius: 2px;
+  padding: 8px 12px;
+  min-height: 44px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.controls button:disabled { opacity: 0.4; cursor: default; }
+@media (hover: hover) {
+  .controls button:not(:disabled):hover { background: var(--crt-fg); color: var(--crt-bg); }
+}
+
 /* Reduce effects (the player's switch, or the system's reduced-motion setting). */
 .reduce .screen { text-shadow: none; }
 .reduce .crt::after { display: none; }
